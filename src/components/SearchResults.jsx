@@ -12,30 +12,35 @@ const PeopleResults = () => {
     const [isLoading, setIsLoading] = useState(false);
 
 
-
     useEffect(() => {
+        // get wanted item object
         axios.get(`https://swapi.dev/api/${search}/${id}`)
             .then(response => {
                 setError(false)
                 setResults(response.data)
-                console.log(response.data)
+
+                // if obj is person 
                 if (search == 'people')
+                    // get homeworld obj that related to the selected obj
                     axios.get(response.data.homeworld)
                         .then(response => {
                             setError(false)
                             setIsLoading(false)
                             setHomewrold(response.data)
-                            // console.log(results.homeworld.toString().slice(results.homeworld.length - 2), 'results')
-                            // console.log(response.data.url)
                         })
                         .catch(() => console.log('planets here'))
+                
+                // if obj is film
                 else if (search == 'films') {
                     let urls = []
+
+                    // get url for each char in the film
                     for (let i of response.data.characters) {
                         urls.push(axios.get(i));
                     }
+
+                    // get all char objs 
                     axios.all(urls)
-                        //Loop through each assignment for each class
                         .then(response => {
                             setIsLoading(false)
                             setChars(response)
@@ -49,12 +54,11 @@ const PeopleResults = () => {
 
         setIsLoading(true)
 
-    }, [search,id])
-    console.log(results)
+    }, [search, id])
 
     // get planet id to pass it tp homeworld link
     if (results.homeworld) {
-        var location1 = results.homeworld.toString().split('/')//.slice(results.homeworld.length - 2)
+        var location1 = results.homeworld.split('/')
         location1 = location1[location1.length - 2]
     }
 
